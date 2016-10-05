@@ -11,4 +11,4 @@ Onsen Watch is a Onsen.ag radio notification, download and listening tool.
 
 ## Screenshot
 
-![Alt text](/z411/onsen-watch/blob/master/screenshot.jpg?raw=true "Onsen Watch")
+![Alt text](/screenshot.jpg?raw=true "Onsen Watch")
