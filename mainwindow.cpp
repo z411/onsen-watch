@@ -78,7 +78,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&download_manager, SIGNAL(showUnqueued(int)), SLOT(onShowUnqueued(int)));
     connect(&download_manager, SIGNAL(showCanceled(int)), SLOT(onShowUnqueued(int)));
     connect(&download_manager, SIGNAL(showStarted(int)), SLOT(onShowStarted(int)));
-    connect(&download_manager, SIGNAL(showFinished(int, int)), SLOT(onShowFinished(int, int)));
+    connect(&download_manager, SIGNAL(showFinished(int)), SLOT(onShowFinished(int)));
     connect(&download_manager, SIGNAL(showError(int)), SLOT(onShowError(int)));
     connect(&download_manager, SIGNAL(thumbFinished(QByteArray,QUrl)), SLOT(onThumbFinished(QByteArray,QUrl)));
 

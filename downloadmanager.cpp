@@ -127,7 +127,6 @@ void DownloadManager::nextShowDownload()
 void DownloadManager::finishFile(const QString & filename, bool rename)
 {
     QFile *file = files[filename];
-    qDebug() << file;
     if(file) {
         file->close();
 
