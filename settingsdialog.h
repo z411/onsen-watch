@@ -14,7 +14,9 @@ class SettingsDialog : public QDialog
 
 public:
     enum PlayerSetting {
+#ifdef USE_QT_MULTIMEDIA
         PLAYER_INTERNAL,
+#endif
         PLAYER_DEFAULT,
         PLAYER_EXTERNAL
     };

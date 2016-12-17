@@ -15,6 +15,13 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui->cmbLanguage->addItem("English", "en");
     ui->cmbLanguage->addItem("日本語", "ja");
 
+    /* Fill players */
+#ifdef USE_QT_MULTIMEDIA
+    ui->cmbPlayer->addItem(tr("Internal"));
+#endif
+    ui->cmbPlayer->addItem(tr("External (default)"));
+    ui->cmbPlayer->addItem(tr("External (custom location)"));
+
     /* Load settings into widgets */
     QSettings settings;
 
@@ -25,7 +32,11 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui->cmbAutodownload->setCurrentIndex(settings.value("autodownload", NOTIFICATION_FAVS).toInt());
     ui->chkSound->setChecked(settings.value("sound", true).toBool());
     ui->txtSoundLocation->setText(settings.value("soundLocation", "audio/alert.wav").toString());
+#ifdef USE_QT_MULTIMEDIA
     ui->cmbPlayer->setCurrentIndex(settings.value("player", PLAYER_INTERNAL).toInt());
+#else
+    ui->cmbPlayer->setCurrentIndex(settings.value("player", PLAYER_EXTERNAL).toInt());
+#endif
     ui->txtPlayerLocation->setText(settings.value("playerLocation", "").toString());
     ui->lblMinutes->setText(tr("%1 minutes").arg(ui->sliRefreshTime->value()));
 

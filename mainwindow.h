@@ -8,8 +8,6 @@
 #include "show.h"
 
 #include <QMainWindow>
-#include <QMediaPlayer>
-#include <QSoundEffect>
 #include <QHash>
 #include <QTimer>
 #include <QItemSelection>
@@ -17,6 +15,11 @@
 #include <QProgressBar>
 #include <QSystemTrayIcon>
 #include <QSettings>
+
+#ifdef USE_QT_MULTIMEDIA
+#include <QMediaPlayer>
+#include <QSoundEffect>
+#endif
 
 namespace Ui {
 class MainWindow;
@@ -45,15 +48,9 @@ private slots:
     void onShowFinished(int row);
     void onShowError(int row);
     void onThumbFinished(QByteArray data, QUrl url);
-    void onDurationChanged(qint64 pos);
-    void onPositionChanged(qint64 pos);
-    void onAntinoise();
     void onProgressStart();
     void onProgress(qint64, qint64);
     void onProgressFinish(const QVector<Show> & new_shows, const QVector<Show> & new_fav_shows);
-    void onMediaState(QMediaPlayer::State state);
-    void onMediaAvailable(bool available);
-    void onMediaSeekable(bool seekable);
 
     void on_btnUpdate_clicked();
     void on_chkFavsOnly_toggled(bool checked);
@@ -66,6 +63,19 @@ private slots:
     void on_lstShowView_doubleClicked(const QModelIndex &);
     void on_actionAbout_Qt_triggered();
     void on_actionSettings_triggered();
+    void on_actionOpenDownloads_triggered();
+    void on_actionAbout_triggered();
+
+#ifdef USE_QT_MULTIMEDIA
+    // Multimedia related functions
+    void onDurationChanged(qint64 pos);
+    void onPositionChanged(qint64 pos);
+    void onAntinoise();
+    void onMediaState(QMediaPlayer::State state);
+    void onMediaAvailable(bool available);
+    void onMediaSeekable(bool seekable);
+
+    void on_btnFocusPlayingShow_clicked();
     void on_sliPosition_sliderMoved(int position);
     void on_sliVolume_valueChanged(int value);
     void on_sliPosition_valueChanged(int value);
@@ -73,9 +83,7 @@ private slots:
     void on_btnMute_toggled(bool checked);
     void on_btnPlay_clicked();
     void on_btnPause_clicked();
-    void on_actionOpenDownloads_triggered();
-    void on_btnFocusPlayingShow_clicked();
-    void on_actionAbout_triggered();
+#endif
 
 private:
     Ui::MainWindow *ui;
@@ -86,10 +94,7 @@ private:
     ShowListProxyModel *proxyModel;
 
     QSettings settings;
-    QMediaPlayer player;
-    QSoundEffect alert_sound;
 
-    QTimer antinoise;
     QTimer refresh_timer;
 
     QLabel * status_text;
@@ -106,11 +111,17 @@ private:
     int selectedRow();
     Show & selectedShow();
 
-
     Show & selected_show;
     int selected_row;
     Show invalid_show;
     int playing_show_row;
+
+#ifdef USE_QT_MULTIMEDIA
+    // Multimedia related
+    QMediaPlayer player;
+    QSoundEffect alert_sound;
+    QTimer antinoise;
+#endif
 };
 
 #endif // MAINWINDOW_H

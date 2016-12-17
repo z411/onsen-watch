@@ -6,7 +6,12 @@
 
 VERSION = 0.1.1
 
-QT       += core gui network multimedia
+QT       += core gui network
+
+packagesExist(QtMultimedia) {
+    QT += multimedia
+    DEFINES += USE_QT_MULTIMEDIA
+}
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

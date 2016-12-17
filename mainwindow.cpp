@@ -102,6 +102,7 @@ MainWindow::MainWindow(QWidget *parent) :
     /* Set up timers */
     setupRefreshTimer();
 
+#ifdef USE_QT_MULTIMEDIA
     /* Set up audio player */
     ui->sliPosition->setStyle(new JumpStyle(ui->sliPosition->style()));
     int volume = settings.value("playerVolume", 100).toInt();
@@ -116,6 +117,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     antinoise.setInterval(200);
     antinoise.setSingleShot(true);
+#endif
 
     /* Schedule the API init */
     QTimer::singleShot(0, this, SLOT(onInit()));
@@ -123,11 +125,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+#ifdef USE_QT_MULTIMEDIA
     // Crashes on *nix (GStreamer) if we don't unload the player first
     player.setMedia(QMediaContent());
 
     // Save the player's volume
     settings.setValue("playerVolume", player.volume());
+#endif
 
     delete ui;
 }
@@ -171,12 +175,14 @@ void MainWindow::setupRefreshTimer()
 
         refresh_timer.start();
 
+#ifdef USE_QT_MULTIMEDIA
         // Setup sound
         if(settings.value("sound", true).toBool()) {
             QString filename = settings.value("soundLocation", "audio/alert.wav").toString();
             alert_sound.setSource(QUrl::fromLocalFile(filename));
             alert_sound.setVolume(1);
         }
+#endif
     } else {
         qDebug() << "Stopping refresh timer.";
         if(refresh_timer.isActive())
@@ -451,8 +457,10 @@ void MainWindow::onProgressFinish(const QVector<Show> & new_shows, const QVector
         {
             tray_icon->showMessage(tr("New Onsen episodes"), tr("There are %1 new episodes available, of which %2 are from your favorites.").arg(new_shows.size()).arg(new_fav_shows.size()));
 
+#ifdef USE_QT_MULTIMEDIA
             if(settings.value("sound", true).toBool())
                 alert_sound.play();
+#endif
         }
     }
 
@@ -478,6 +486,7 @@ void MainWindow::setPlayer(const Show &cur_show, bool play)
 {
     QString filename = DownloadManager::makeShowFilename(cur_show);
     /* Attempt to play episode */
+#ifdef USE_QT_MULTIMEDIA
     SettingsDialog::PlayerSetting player_setting = (SettingsDialog::PlayerSetting)settings.value("player", SettingsDialog::PLAYER_INTERNAL).toInt();
     if(player_setting == SettingsDialog::PLAYER_INTERNAL) {
         status(QString("Playing %1 #%2.").arg(cur_show.id, QString::number(cur_show.ep)));
@@ -499,7 +508,11 @@ void MainWindow::setPlayer(const Show &cur_show, bool play)
 
         if(play)
             player.play();
-    } else if(player_setting == SettingsDialog::PLAYER_DEFAULT) {
+    } else
+#else
+    SettingsDialog::PlayerSetting player_setting = (SettingsDialog::PlayerSetting)settings.value("player", SettingsDialog::PLAYER_EXTERNAL).toInt();
+#endif
+    if(player_setting == SettingsDialog::PLAYER_DEFAULT) {
         // Launch
         status(QString("Launching %1 #%2.").arg(cur_show.id, QString::number(cur_show.ep)));
         QDesktopServices::openUrl(QUrl::fromLocalFile(filename));
@@ -522,27 +535,6 @@ void MainWindow::setPlayer(const Show &cur_show, bool play)
         data_store.setWatched(cur_show, QDate::currentDate());
 }
 
-void MainWindow::onDurationChanged(qint64 pos)
-{
-    ui->sliPosition->setMaximum(pos);
-}
-
-void MainWindow::onPositionChanged(qint64 pos)
-{
-    if(!ui->sliPosition->isSliderDown()) {
-        ui->sliPosition->blockSignals(true);
-        ui->sliPosition->setValue(pos);
-        ui->sliPosition->blockSignals(false);
-        ui->lblPlayerTime->setText(QTime::fromMSecsSinceStartOfDay(pos).toString("mm:ss") + " / " + QTime::fromMSecsSinceStartOfDay(player.duration()).toString("mm:ss"));
-    }
-}
-
-void MainWindow::onAntinoise()
-{
-    if(!ui->btnMute->isChecked())
-        player.setMuted(false);
-}
-
 void MainWindow::on_lstShowView_clicked(const QModelIndex &index)
 {
     if(index.column() == ShowListModel::COLUMN_DOWNLOAD)
@@ -558,7 +550,6 @@ void MainWindow::on_lstShowView_clicked(const QModelIndex &index)
                 break;
             case DOWNLOAD_FINISHED:
                 setPlayer(cur_show, true);
-                qDebug() << player.mediaStatus();
                 break;
             case DOWNLOAD_QUEUED:
                 download_manager.unqueueShowDownload(cur_show);
@@ -607,6 +598,28 @@ void MainWindow::on_actionSettings_triggered()
     if(dialog.exec() == QDialog::Accepted) {
         setupRefreshTimer();
     }
+}
+
+#ifdef USE_QT_MULTIMEDIA
+void MainWindow::onDurationChanged(qint64 pos)
+{
+    ui->sliPosition->setMaximum(pos);
+}
+
+void MainWindow::onPositionChanged(qint64 pos)
+{
+    if(!ui->sliPosition->isSliderDown()) {
+        ui->sliPosition->blockSignals(true);
+        ui->sliPosition->setValue(pos);
+        ui->sliPosition->blockSignals(false);
+        ui->lblPlayerTime->setText(QTime::fromMSecsSinceStartOfDay(pos).toString("mm:ss") + " / " + QTime::fromMSecsSinceStartOfDay(player.duration()).toString("mm:ss"));
+    }
+}
+
+void MainWindow::onAntinoise()
+{
+    if(!ui->btnMute->isChecked())
+        player.setMuted(false);
 }
 
 void MainWindow::on_sliPosition_sliderMoved(int position)
@@ -684,12 +697,6 @@ void MainWindow::onMediaState(QMediaPlayer::State state)
     }
 }
 
-void MainWindow::on_actionOpenDownloads_triggered()
-{
-    if(QDir("download").exists())
-        QDesktopServices::openUrl(QUrl("download"));
-}
-
 void MainWindow::on_btnFocusPlayingShow_clicked()
 {
     if(playing_show_row != -1) {
@@ -697,6 +704,13 @@ void MainWindow::on_btnFocusPlayingShow_clicked()
         ui->lstShowView->selectRow(index.row());
         ui->lstShowView->setFocus();
     }
+}
+#endif
+
+void MainWindow::on_actionOpenDownloads_triggered()
+{
+    if(QDir("download").exists())
+        QDesktopServices::openUrl(QUrl("download"));
 }
 
 void MainWindow::on_actionAbout_triggered()

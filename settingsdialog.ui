@@ -68,21 +68,6 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <item>
-        <property name="text">
-         <string>Internal</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>External (default)</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>External (custom location)</string>
-        </property>
-       </item>
       </widget>
      </item>
      <item row="8" column="0">
