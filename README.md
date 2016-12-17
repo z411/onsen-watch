@@ -16,7 +16,14 @@ Windows (32-bit): https://github.com/z411/onsen-watch/releases/download/v0.1.1/o
 You need these dependencies:
 
 * libxml2
-* Qt5
+* QtCore5
+* QtGui5
+* QtNetwork5
+* QtWidgets5
+
+These are optional:
+
+* QtMultimedia5 (if you want sound alerts and the internal media player)
 
 Then clone repo and go into directory:
 
