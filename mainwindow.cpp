@@ -709,8 +709,9 @@ void MainWindow::on_btnFocusPlayingShow_clicked()
 
 void MainWindow::on_actionOpenDownloads_triggered()
 {
-    if(QDir("download").exists())
-        QDesktopServices::openUrl(QUrl("download"));
+    QString dataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if(QDir(dataDir + "/download").exists())
+        QDesktopServices::openUrl(QUrl(dataDir + "/download"));
 }
 
 void MainWindow::on_actionAbout_triggered()
