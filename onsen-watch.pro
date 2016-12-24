@@ -15,9 +15,14 @@ packagesExist(QtMultimedia) {
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+isEmpty(PREFIX) {
+    PREFIX = /usr/local
+}
 TARGET = onsen-watch
-TEMPLATE = app
+target.path = $$PREFIX/bin/
+INSTALLS += target
 
+TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -63,8 +68,5 @@ win32 {
 }
 
 RESOURCES += res.qrc
-
-target.path = /usr/local/bin
-INSTALLS += target
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
