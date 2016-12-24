@@ -209,7 +209,8 @@ void MainWindow::setInfo()
         ui->btnDownload->setEnabled(!selected_show.file.isEmpty());
 
         // Load thumbnail from cache; download it otherwise
-        QString filename = "cache/" + QUrl(selected_show.img_url).fileName();
+        QString dataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        QString filename = dataDir + "/cache/" + QUrl(selected_show.img_url).fileName();
         if(QFileInfo(filename).exists()) {
             QPixmap pix;
             pix.load(filename);
@@ -492,7 +493,8 @@ void MainWindow::setPlayer(const Show &cur_show, bool play)
         status(QString("Playing %1 #%2.").arg(cur_show.id, QString::number(cur_show.ep)));
 
         // Set thumbnail
-        QString thumb = "cache/" + QUrl(cur_show.img_url).fileName();
+        QString dataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        QString thumb = dataDir + "/cache/" + QUrl(cur_show.img_url).fileName();
         if(QFileInfo(thumb).exists()) {
             QPixmap pix;
             pix.load(thumb);
