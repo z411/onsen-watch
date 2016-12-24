@@ -64,4 +64,7 @@ win32 {
 
 RESOURCES += res.qrc
 
+target.path = /usr/local/bin
+INSTALLS += target
+
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
