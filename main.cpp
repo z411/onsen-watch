@@ -3,6 +3,8 @@
 #include <QSettings>
 #include <QTranslator>
 #include <QLibraryInfo>
+#include <QStandardPaths>
+#include <QDir>
 
 int main(int argc, char *argv[])
 {
@@ -10,12 +12,13 @@ int main(int argc, char *argv[])
 
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QApplication::setApplicationName("onsen-watch");
-    QApplication::setOrganizationName("omaera");
 
     QSettings settings;
     QString locale = settings.value("locale", QLocale::system().name()).toString();
     if(locale.isEmpty())
         locale = QLocale::system().name();
+
+    QDir().mkpath(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
 
     QTranslator qtTranslator;
     qtTranslator.load("qt_" + locale, QLibraryInfo::location(QLibraryInfo::TranslationsPath));

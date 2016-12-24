@@ -5,9 +5,11 @@
 #include <QUrl>
 #include <QNetworkRequest>
 #include <QDir>
+#include <QStandardPaths>
 
 DownloadManager::DownloadManager(QObject *parent) : QObject(parent)
 {
+    dataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 }
 
 void DownloadManager::singleShot(QString url)
@@ -91,7 +93,7 @@ void DownloadManager::nextShowDownload()
             return;
 
         qDebug() << "Opening file.";
-        QDir().mkdir("download");
+        QDir().mkpath(dataDir + "/download");
         QFile *file = new QFile(filename);
 
         if (!file->open(QIODevice::WriteOnly)) {
@@ -161,8 +163,8 @@ void DownloadManager::onThumbFinished()
             QString filename = reply->request().url().fileName();
             QByteArray data = reply->readAll();
 
-            QDir().mkdir("cache");
-            QFile file("cache/" + filename);
+            QDir().mkpath(dataDir + "/cache");
+            QFile file(dataDir + "/cache/" + filename);
             file.open(QIODevice::WriteOnly);
             file.write(data);
             file.flush();
@@ -233,5 +235,7 @@ void DownloadManager::onShowError(QNetworkReply::NetworkError code) {
 
 QString DownloadManager::makeShowFilename(const Show & cur_show, bool incomplete)
 {
-    return (incomplete ? "download/inc_" : "download/") + cur_show.id + "_" + QString::number(cur_show.ep) + ".mp3";
+    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
+           (incomplete ? "/download/inc_" : "/download/") +
+           cur_show.id + "_" + QString::number(cur_show.ep) + ".mp3";
 }

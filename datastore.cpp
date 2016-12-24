@@ -3,6 +3,8 @@
 #include <QFile>
 #include <QDebug>
 #include <QSettings>
+#include <QDir>
+#include <QStandardPaths>
 
 #define MAGIC_NUMBER 0x6F6E7365
 #define MAGIC_VERSION 10
@@ -11,8 +13,11 @@ DataStore::DataStore()
 {
     connect(&download_manager, SIGNAL(gotData(QByteArray)), SLOT(onGotData(QByteArray)));
     connect(&download_manager, SIGNAL(gotProgress(qint64,qint64)), SLOT(onGotProgress(qint64,qint64)));
-    shows_file.setFileName("shows.dat");
-    user_file.setFileName("user.dat");
+
+    QString dataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+
+    shows_file.setFileName(dataDir + "/shows.dat");
+    user_file.setFileName(dataDir + "/user.dat");
 }
 
 
@@ -84,7 +89,8 @@ void DataStore::save()
 
         shows_file.flush();
         shows_file.close();
-    }
+    } else
+        qDebug() << "Warning: Couldn't write data store";
 }
 
 int DataStore::loadUser()

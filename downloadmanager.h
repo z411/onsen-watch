@@ -64,6 +64,8 @@ private:
     QHash<QString, QNetworkReply*> downloads;
     QQueue<QueuePair> queue;
 
+    QString dataDir;
+
     void nextShowDownload();
     void finishFile(const QString & filename, bool rename);
 };
